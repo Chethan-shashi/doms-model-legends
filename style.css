@@ -259,23 +259,24 @@ textarea:focus-visible,select:focus-visible,.g-item:focus-visible{
 @media(max-width:640px){
   .unveil{grid-template-columns:1fr;gap:8px}
   .unveil-date{font-size:.88rem}
+}
 
 /* ── Workshop team cards ── */
-.wt-card{display:grid;grid-template-columns:280px 1fr;gap:0;background:#fff;
+.wt-card{display:grid;grid-template-columns:190px 1fr;gap:0;background:#fff;
   border:1px solid var(--blue-mid);border-radius:var(--radius);overflow:hidden;
-  max-width:860px;margin:40px auto 0;transition:var(--t)}
+  max-width:720px;margin:36px auto 0;transition:var(--t)}
 .wt-card:hover{box-shadow:var(--shadow)}
-.wt-photo{position:relative;background:var(--blue-light);min-height:300px}
-.wt-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%}
+.wt-photo{position:relative;background:var(--blue-light)}
+.wt-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 22%}
 .wt-photo.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:10px;color:var(--blue);font-size:2.4rem;text-align:center;padding:24px}
 .wt-photo.empty span{font-size:.78rem;color:var(--text-grey);font-weight:500}
-.wt-info{padding:30px}
-.wt-name{font-size:1.25rem;font-weight:700;margin-bottom:3px}
+.wt-info{padding:26px 28px}
+.wt-name{font-size:1.15rem;font-weight:700;margin-bottom:3px}
 .wt-role{color:var(--blue);font-size:.87rem;font-weight:600;margin-bottom:16px}
-.wt-bio{color:var(--text-grey);font-size:.9rem;line-height:1.85}
+.wt-bio{color:var(--text-grey);font-size:.87rem;line-height:1.8}
 @media(max-width:640px){
-  .wt-card{grid-template-columns:1fr}
-  .wt-photo{min-height:0;aspect-ratio:4/3}
+  .wt-card{grid-template-columns:1fr;max-width:100%}
+  .wt-photo{aspect-ratio:4/3}
   .wt-info{padding:24px}
-}  
+}
