@@ -6,12 +6,17 @@
   'use strict';
 
   /* ---------------------------------------------------------
-     CONFIG — change this one line to switch on the contact form
-     1. Sign up free at https://formspree.io
-     2. Create a form, copy the endpoint it gives you
-     3. Paste it below, replacing the empty string
+     CONTACT FORM SETUP  —  edit this one line only
+
+     1. Go to  https://web3forms.com
+     2. Enter  legendsmodelling1940@outlook.com  and press Create
+     3. The access key arrives by email (no account needed)
+     4. Paste it between the quotes below
+
+     Until a key is set, the form falls back to opening the
+     visitor's email app instead of sending directly.
      --------------------------------------------------------- */
-  var FORMSPREE_ENDPOINT = ''; // e.g. 'https://formspree.io/f/xyzabcde'
+  var ACCESS_KEY = 'b80749f2-f34f-41c9-b644-58a3df45bda4';   // e.g. 'a1b2c3d4-5e6f-7890-abcd-ef1234567890'
 
   /* =========================================================
      PAGE NAVIGATION
@@ -170,6 +175,11 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closePopup();
+    // Enter / Space on the close button
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.id === 'lb-close') {
+      e.preventDefault();
+      closePopup();
+    }
   });
 
   // Keyboard support for gallery items
@@ -193,7 +203,7 @@
 
   /* =========================================================
      CONTACT FORM
-     Sends via Formspree when FORMSPREE_ENDPOINT is set.
+     Sends via Web3Forms when ACCESS_KEY is set.
      Falls back to opening the user's email client if not.
      ========================================================= */
   var form = document.getElementById('contactForm');
@@ -229,8 +239,11 @@
       if (!validEmail(email)) { form.email.classList.add('invalid'); return say('Please enter a valid email address.', 'err'); }
       if (!message) { form.message.classList.add('invalid'); return say('Please enter a message.', 'err'); }
 
-      // No endpoint configured -> fall back to mailto
-      if (!FORMSPREE_ENDPOINT) {
+      // Honeypot — bots fill hidden fields, humans don't
+      if (form.botcheck && form.botcheck.checked) return;
+
+      // No access key yet -> fall back to opening the email app
+      if (!ACCESS_KEY) {
         var body = 'Name: ' + name + '\nEmail: ' + email + '\nSubject: ' + subject + '\n\n' + message;
         window.location.href = 'mailto:legendsmodelling1940@outlook.com'
           + '?subject=' + encodeURIComponent('Website enquiry: ' + subject)
@@ -239,18 +252,31 @@
         return;
       }
 
-      // Send via Formspree
       btn.disabled = true;
       btn.textContent = 'Sending…';
       say('Sending your message…', 'ok');
 
-      fetch(FORMSPREE_ENDPOINT, {
+      var payload = {
+        access_key: ACCESS_KEY,
+        subject: 'Website enquiry: ' + subject,
+        from_name: 'Doms Model Legends website',
+        name: name,
+        email: email,
+        enquiry_type: subject,
+        message: message
+      };
+
+      fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: new FormData(form)
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
       })
-        .then(function (res) {
-          if (res.ok) {
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.success) {
             form.reset();
             say('Thank you! Your message has been sent. Dom will be in touch soon.', 'ok');
             btn.textContent = 'Message Sent';
@@ -259,7 +285,7 @@
               btn.textContent = 'Send Message →';
             }, 4000);
           } else {
-            throw new Error('Server error');
+            throw new Error(data.message || 'Server error');
           }
         })
         .catch(function () {
